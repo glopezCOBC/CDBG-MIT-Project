@@ -4,19 +4,13 @@
   <meta charset="utf-8" />
   <title>Bay City CDBG MIT Drainage Project</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- QGIS2Web Leaflet Styles -->
   <link rel="stylesheet" href="resources/leaflet.css" />
   <link rel="stylesheet" href="resources/qgis2web.css" />
-  <script src="resources/qgis2web_expressions.js"></script>
-  <script src="resources/leaflet.js"></script>
-  <script src="resources/leaflet.rotatedMarker.js"></script>
-  <script src="resources/leaflet.pattern.js"></script>
-  <script src="resources/leaflet-hash.js"></script>
-  <script src="resources/Autolinker.min.js"></script>
-  <script src="resources/rbush.min.js"></script>
-  <script src="resources/labelgun.min.js"></script>
-  <script src="resources/labels.js"></script>
-  <script src="resources/leaflet-control-geocoder.Geocoder.js"></script>
   <link rel="stylesheet" href="resources/leaflet-control-geocoder.Geocoder.css" />
+
+  <!-- Custom Page Styles -->
   <style>
     html, body {
       height: 100%;
@@ -43,15 +37,15 @@
 </head>
 <body>
 
-<!-- Top Banner -->
+<!-- Header -->
 <div style="position: absolute; top: 0; left: 0; right: 0; height: 50px; background: #004080; color: white; display: flex; align-items: center; padding-left: 20px; z-index: 1001;">
-  <img src="https://github.com/glopezCOBC/CDBG-MIT-Project/raw/main/CITY_SEAL.png" alt="City Seal" height="32" style="margin-right: 10px;">
+  <img src="https://glopezCOBC.github.io/CDBG-MIT-Project/CITY_SEAL.png" alt="City Seal" height="32" style="margin-right: 10px;">
   Bay City CDBG MIT Drainage Project
 </div>
 
 <!-- Sidebar -->
 <div id="pdfSidebar" style="position: absolute; top: 50px; left: 0; width: 220px; height: calc(100% - 50px); background: #e6f0ff; padding: 15px; box-shadow: 2px 0 5px rgba(0,0,0,0.1); z-index: 1000;">
-  <img src="https://github.com/glopezCOBC/CDBG-MIT-Project/raw/main/CITY_SEAL.png" alt="City Seal" style="width: 100px; margin-bottom: 10px;">
+  <img src="https://glopezCOBC.github.io/CDBG-MIT-Project/CITY_SEAL.png" alt="City Seal" style="width: 100px; margin-bottom: 10px;">
   <h3 style="margin-top: 0; font-size: 16px;">Documents</h3>
   <ul id="pdfLinks" style="list-style-type: none; padding-left: 0; font-size: 14px; line-height: 1.6;">
     <li><a href="#" class="pdf-link" onclick="openPDF('City%20of%20Bay%20City%20-%20Project%20Map%20Area%2014.pdf', this)">📄 View Area 14 Map</a></li>
@@ -71,22 +65,31 @@
   <iframe id="pdfFrame" src="" style="width: 100%; height: calc(100% - 40px); border: none;"></iframe>
 </div>
 
-<!-- QGIS2Web Scripts -->
+<!-- QGIS2Web + Leaflet Scripts -->
+<script src="resources/leaflet.js"></script>
+<script src="resources/qgis2web_expressions.js"></script>
+<script src="resources/leaflet.rotatedMarker.js"></script>
+<script src="resources/leaflet.pattern.js"></script>
+<script src="resources/leaflet-hash.js"></script>
+<script src="resources/Autolinker.min.js"></script>
+<script src="resources/rbush.min.js"></script>
+<script src="resources/labelgun.min.js"></script>
+<script src="resources/labels.js"></script>
+<script src="resources/leaflet-control-geocoder.Geocoder.js"></script>
 <script src="qgis2web_expressions.js"></script>
 <script src="resources/layers/layers.js"></script>
 <script src="resources/qgis2web.js"></script>
 
-<!-- Modal + Highlight Script -->
+<!-- PDF Viewer Logic -->
 <script>
   function openPDF(filename, linkElement) {
     const modal = document.getElementById("pdfModal");
     const iframe = document.getElementById("pdfFrame");
     const title = document.getElementById("pdfTitle");
-    iframe.src = `https://github.com/glopezCOBC/CDBG-MIT-Project/raw/main/${filename}`;
+    iframe.src = `https://glopezCOBC.github.io/CDBG-MIT-Project/${filename}`;
     title.textContent = decodeURIComponent(filename.replace('.pdf', ''));
     modal.style.display = "block";
 
-    // Highlight active link
     document.querySelectorAll('.pdf-link').forEach(link => link.style.fontWeight = 'normal');
     if (linkElement) linkElement.style.fontWeight = 'bold';
   }
