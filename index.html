@@ -1,22 +1,24 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width" />
   <title>Bay City CDBG MIT Drainage Project</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- QGIS2Web Leaflet Styles -->
-  <link rel="stylesheet" href="resources/leaflet.css" />
-  <link rel="stylesheet" href="resources/qgis2web.css" />
-  <link rel="stylesheet" href="resources/leaflet-control-geocoder.Geocoder.css" />
+  <!-- Core OpenLayers/QGIS2Web styles -->
+  <link rel="stylesheet" href="./resources/ol.css" />
+  <link rel="stylesheet" href="resources/fontawesome-all.min.css" />
+  <link rel="stylesheet" href="./resources/ol-layerswitcher.css" />
+  <link rel="stylesheet" href="./resources/qgis2web.css" />
 
-  <!-- Custom Page Styles -->
   <style>
     html, body {
-      height: 100%;
       margin: 0;
+      padding: 0;
       font-family: sans-serif;
     }
+
     #map {
       position: absolute;
       top: 50px;
@@ -24,6 +26,7 @@
       right: 0;
       bottom: 0;
     }
+
     @media (max-width: 700px) {
       #map {
         left: 0;
@@ -33,104 +36,195 @@
         display: none;
       }
     }
+
+    .ol-control > * {
+      background-color: #f8f8f8 !important;
+      color: #444 !important;
+      border-radius: 0;
+    }
+
+    /* HEADER BAR */
+    #headerBar {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 50px;
+      background: #004080;
+      color: white;
+      display: flex;
+      align-items: center;
+      padding-left: 20px;
+      z-index: 1001;
+    }
+
+    /* SIDEBAR */
+    #pdfSidebar {
+      position: absolute;
+      top: 50px;
+      left: 0;
+      width: 220px;
+      height: calc(100% - 50px);
+      background: #e6f0ff;
+      padding: 15px;
+      box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+      z-index: 1000;
+    }
+
+    /* MODAL */
+    #pdfModal {
+      display: none;
+      position: fixed;
+      top: 10%;
+      left: 10%;
+      width: 80%;
+      height: 80%;
+      background: white;
+      border: 2px solid #888;
+      z-index: 2000;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    }
+
+    #modalHeader {
+      background: #004080;
+      color: white;
+      padding: 8px 12px;
+      cursor: move;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    #modalHeader button {
+      background: white;
+      color: #004080;
+      font-weight: bold;
+      border: none;
+      padding: 5px 10px;
+      cursor: pointer;
+    }
+
+    #pdfFrame {
+      width: 100%;
+      height: calc(100% - 40px);
+      border: none;
+    }
+
+    .pdf-link {
+      text-decoration: none;
+    }
+
+    .pdf-link:hover {
+      text-decoration: underline;
+    }
   </style>
 </head>
+
 <body>
-
-<!-- Header -->
-<div style="position: absolute; top: 0; left: 0; right: 0; height: 50px; background: #004080; color: white; display: flex; align-items: center; padding-left: 20px; z-index: 1001;">
-  <img src="https://glopezCOBC.github.io/CDBG-MIT-Project/CITY_SEAL.png" alt="City Seal" height="32" style="margin-right: 10px;">
-  Bay City CDBG MIT Drainage Project
-</div>
-
-<!-- Sidebar -->
-<div id="pdfSidebar" style="position: absolute; top: 50px; left: 0; width: 220px; height: calc(100% - 50px); background: #e6f0ff; padding: 15px; box-shadow: 2px 0 5px rgba(0,0,0,0.1); z-index: 1000;">
-  <img src="https://glopezCOBC.github.io/CDBG-MIT-Project/CITY_SEAL.png" alt="City Seal" style="width: 100px; margin-bottom: 10px;">
-  <h3 style="margin-top: 0; font-size: 16px;">Documents</h3>
-  <ul id="pdfLinks" style="list-style-type: none; padding-left: 0; font-size: 14px; line-height: 1.6;">
-    <li><a href="#" class="pdf-link" onclick="openPDF('City%20of%20Bay%20City%20-%20Project%20Map%20Area%2014.pdf', this)">📄 View Area 14 Map</a></li>
-    <li><a href="#" class="pdf-link" onclick="openPDF('City%20of%20Bay%20City%20-%20Project%20Map%20Area%2019.pdf', this)">📄 View Area 19 Map</a></li>
-  </ul>
-</div>
-
-<!-- Map Container -->
-<div id="map"></div>
-
-<!-- Modal PDF Viewer -->
-<div id="pdfModal" style="display: none; position: fixed; top: 10%; left: 10%; width: 80%; height: 80%; background: white; border: 2px solid #888; z-index: 2000; box-shadow: 0 0 10px rgba(0,0,0,0.3);">
-  <div id="modalHeader" style="background: #004080; color: white; padding: 8px 12px; cursor: move; display: flex; justify-content: space-between; align-items: center;">
-    <span id="pdfTitle" style="font-weight: bold;">PDF Viewer</span>
-    <button onclick="closePDF()" style="background: white; color: #004080; font-weight: bold; border: none; padding: 5px 10px; cursor: pointer;">✖ Close</button>
+  <!-- HEADER -->
+  <div id="headerBar">
+    <a href="https://www.cityofbaycity.org/" target="_blank">
+      <img src="CITY_SEAL.png" height="32" alt="City Seal" style="margin-right: 10px; cursor: pointer;" />
+    </a>
+    Bay City CDBG MIT Drainage Project
   </div>
-  <iframe id="pdfFrame" src="" style="width: 100%; height: calc(100% - 40px); border: none;"></iframe>
-</div>
 
-<!-- QGIS2Web + Leaflet Scripts -->
-<script src="resources/leaflet.js"></script>
-<script src="resources/qgis2web_expressions.js"></script>
-<script src="resources/leaflet.rotatedMarker.js"></script>
-<script src="resources/leaflet.pattern.js"></script>
-<script src="resources/leaflet-hash.js"></script>
-<script src="resources/Autolinker.min.js"></script>
-<script src="resources/rbush.min.js"></script>
-<script src="resources/labelgun.min.js"></script>
-<script src="resources/labels.js"></script>
-<script src="resources/leaflet-control-geocoder.Geocoder.js"></script>
-<script src="qgis2web_expressions.js"></script>
-<script src="resources/layers/layers.js"></script>
-<script src="resources/qgis2web.js"></script>
+  <!-- SIDEBAR -->
+  <div id="pdfSidebar">
+    <a href="https://www.cityofbaycity.org/" target="_blank">
+      <img src="CITY_SEAL.png" style="width: 100px; margin-bottom: 10px; cursor: pointer;" alt="City Seal" />
+    </a>
+    <h3 style="margin-top: 0; font-size: 16px;">Documents</h3>
+    <ul style="list-style-type: none; padding-left: 0; font-size: 14px; line-height: 1.6;">
+      <li><a href="#" class="pdf-link" onclick="openPDF('City%20of%20Bay%20City%20-%20Project%20Map%20Area%2014.pdf', this)">📄 View Area 14 Map</a></li>
+      <li><a href="#" class="pdf-link" onclick="openPDF('City%20of%20Bay%20City%20-%20Project%20Map%20Area%2019.pdf', this)">📄 View Area 19 Map</a></li>
+    </ul>
+  </div>
 
-<!-- PDF Viewer Logic -->
-<script>
-  function openPDF(filename, linkElement) {
-    const modal = document.getElementById("pdfModal");
-    const iframe = document.getElementById("pdfFrame");
-    const title = document.getElementById("pdfTitle");
-    iframe.src = `https://glopezCOBC.github.io/CDBG-MIT-Project/${filename}`;
-    title.textContent = decodeURIComponent(filename.replace('.pdf', ''));
-    modal.style.display = "block";
+  <!-- MAP -->
+  <div id="map">
+    <div id="popup" class="ol-popup">
+      <a href="#" id="popup-closer" class="ol-popup-closer"></a>
+      <div id="popup-content"></div>
+    </div>
+  </div>
 
-    document.querySelectorAll('.pdf-link').forEach(link => link.style.fontWeight = 'normal');
-    if (linkElement) linkElement.style.fontWeight = 'bold';
-  }
+  <!-- MODAL PDF VIEWER -->
+  <div id="pdfModal">
+    <div id="modalHeader">
+      <span id="pdfTitle">PDF Viewer</span>
+      <button onclick="closePDF()">✖ Close</button>
+    </div>
+    <iframe id="pdfFrame"></iframe>
+  </div>
 
-  function closePDF() {
-    document.getElementById("pdfModal").style.display = "none";
-    document.getElementById("pdfFrame").src = "";
-    document.querySelectorAll('.pdf-link').forEach(link => link.style.fontWeight = 'normal');
-  }
+  <!-- QGIS2Web + OpenLayers Scripts -->
+  <script src="resources/qgis2web_expressions.js"></script>
+  <script src="./resources/functions.js"></script>
+  <script src="./resources/ol.js"></script>
+  <script src="./resources/ol-layerswitcher.js"></script>
+  <script src="layers/PerformanceMeasures_1.js"></script>
+  <script src="layers/ActivityMidpoints_2.js"></script>
+  <script src="layers/StormSewer_3.js"></script>
+  <script src="layers/Inlets_4.js"></script>
+  <script src="styles/PerformanceMeasures_1_style.js"></script>
+  <script src="styles/ActivityMidpoints_2_style.js"></script>
+  <script src="styles/StormSewer_3_style.js"></script>
+  <script src="styles/Inlets_4_style.js"></script>
+  <script src="./layers/layers.js" type="text/javascript"></script>
+  <script src="./resources/Autolinker.min.js"></script>
+  <script src="./resources/qgis2web.js"></script>
 
-  // Make modal draggable
-  dragElement(document.getElementById("pdfModal"));
-  function dragElement(elmnt) {
-    const header = document.getElementById("modalHeader");
-    let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
-    header.onmousedown = dragMouseDown;
+  <!-- PDF Viewer Script -->
+  <script>
+    function openPDF(filename, linkElement) {
+      const modal = document.getElementById("pdfModal");
+      const iframe = document.getElementById("pdfFrame");
+      const title = document.getElementById("pdfTitle");
+      iframe.src = `https://glopezCOBC.github.io/CDBG-MIT-Project/${filename}`;
+      title.textContent = decodeURIComponent(filename.replace('.pdf', ''));
+      modal.style.display = "block";
 
-    function dragMouseDown(e) {
-      e.preventDefault();
-      pos3 = e.clientX;
-      pos4 = e.clientY;
-      document.onmouseup = closeDragElement;
-      document.onmousemove = elementDrag;
+      document.querySelectorAll('.pdf-link').forEach(link => link.style.fontWeight = 'normal');
+      if (linkElement) linkElement.style.fontWeight = 'bold';
     }
 
-    function elementDrag(e) {
-      e.preventDefault();
-      pos1 = pos3 - e.clientX;
-      pos2 = pos4 - e.clientY;
-      pos3 = e.clientX;
-      pos4 = e.clientY;
-      elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
-      elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+    function closePDF() {
+      document.getElementById("pdfModal").style.display = "none";
+      document.getElementById("pdfFrame").src = "";
+      document.querySelectorAll('.pdf-link').forEach(link => link.style.fontWeight = 'normal');
     }
 
-    function closeDragElement() {
-      document.onmouseup = null;
-      document.onmousemove = null;
-    }
-  }
-</script>
+    // Make modal draggable
+    dragElement(document.getElementById("pdfModal"));
+    function dragElement(elmnt) {
+      const header = document.getElementById("modalHeader");
+      let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+      header.onmousedown = dragMouseDown;
 
+      function dragMouseDown(e) {
+        e.preventDefault();
+        pos3 = e.clientX;
+        pos4 = e.clientY;
+        document.onmouseup = closeDragElement;
+        document.onmousemove = elementDrag;
+      }
+
+      function elementDrag(e) {
+        e.preventDefault();
+        pos1 = pos3 - e.clientX;
+        pos2 = pos4 - e.clientY;
+        pos3 = e.clientX;
+        pos4 = e.clientY;
+        elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
+        elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+      }
+
+      function closeDragElement() {
+        document.onmouseup = null;
+        document.onmousemove = null;
+      }
+    }
+  </script>
 </body>
 </html>
