@@ -2,11 +2,9 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width" />
   <title>Bay City CDBG MIT Drainage Project</title>
 
-  <!-- Core OpenLayers/QGIS2Web styles -->
   <link rel="stylesheet" href="./resources/ol.css" />
   <link rel="stylesheet" href="resources/fontawesome-all.min.css" />
   <link rel="stylesheet" href="./resources/ol-layerswitcher.css" />
@@ -16,6 +14,9 @@
     html, body {
       margin: 0;
       padding: 0;
+      overflow: hidden;
+      height: 100%;
+      width: 100%;
       font-family: sans-serif;
     }
 
@@ -27,28 +28,11 @@
       bottom: 0;
     }
 
-    @media (max-width: 700px) {
-      #map {
-        left: 0;
-        top: 100px;
-      }
-      #pdfSidebar {
-        display: none;
-      }
-    }
-
-    .ol-control > * {
-      background-color: #f8f8f8 !important;
-      color: #444 !important;
-      border-radius: 0;
-    }
-
-    /* HEADER BAR */
     #headerBar {
-      position: absolute;
+      position: fixed;
       top: 0;
       left: 0;
-      right: 0;
+      width: 100vw;
       height: 50px;
       background: #004080;
       color: white;
@@ -56,9 +40,9 @@
       align-items: center;
       padding-left: 20px;
       z-index: 1001;
+      box-sizing: border-box;
     }
 
-    /* SIDEBAR */
     #pdfSidebar {
       position: absolute;
       top: 50px;
@@ -71,7 +55,6 @@
       z-index: 1000;
     }
 
-    /* MODAL */
     #pdfModal {
       display: none;
       position: fixed;
@@ -112,36 +95,43 @@
 
     .pdf-link {
       text-decoration: none;
+      cursor: pointer;
     }
 
     .pdf-link:hover {
       text-decoration: underline;
     }
+
+    @media (max-width: 700px) {
+      #map {
+        left: 0;
+        top: 100px;
+      }
+      #pdfSidebar {
+        display: none;
+      }
+    }
   </style>
 </head>
-
 <body>
-  <!-- HEADER -->
   <div id="headerBar">
     <a href="https://www.cityofbaycity.org/" target="_blank">
-      <img src="CITY_SEAL.png" height="32" alt="City Seal" style="margin-right: 10px; cursor: pointer;" />
+      <img src="CITY_SEAL.png" height="32" style="margin-right: 10px; cursor: pointer;" alt="City Seal" />
     </a>
     Bay City CDBG MIT Drainage Project
   </div>
 
-  <!-- SIDEBAR -->
   <div id="pdfSidebar">
     <a href="https://www.cityofbaycity.org/" target="_blank">
       <img src="CITY_SEAL.png" style="width: 100px; margin-bottom: 10px; cursor: pointer;" alt="City Seal" />
     </a>
     <h3 style="margin-top: 0; font-size: 16px;">Documents</h3>
     <ul style="list-style-type: none; padding-left: 0; font-size: 14px; line-height: 1.6;">
-      <li><a href="#" class="pdf-link" onclick="openPDF('City%20of%20Bay%20City%20-%20Project%20Map%20Area%2014.pdf', this)">📄 View Area 14 Map</a></li>
-      <li><a href="#" class="pdf-link" onclick="openPDF('City%20of%20Bay%20City%20-%20Project%20Map%20Area%2019.pdf', this)">📄 View Area 19 Map</a></li>
+      <li><a class="pdf-link" onclick="openPDF('City%20of%20Bay%20City%20-%20Project%20Map%20Area%2014.pdf', this)">📄 View Area 14 Map</a></li>
+      <li><a class="pdf-link" onclick="openPDF('City%20of%20Bay%20City%20-%20Project%20Map%20Area%2019.pdf', this)">📄 View Area 19 Map</a></li>
     </ul>
   </div>
 
-  <!-- MAP -->
   <div id="map">
     <div id="popup" class="ol-popup">
       <a href="#" id="popup-closer" class="ol-popup-closer"></a>
@@ -149,7 +139,6 @@
     </div>
   </div>
 
-  <!-- MODAL PDF VIEWER -->
   <div id="pdfModal">
     <div id="modalHeader">
       <span id="pdfTitle">PDF Viewer</span>
@@ -158,7 +147,6 @@
     <iframe id="pdfFrame"></iframe>
   </div>
 
-  <!-- QGIS2Web + OpenLayers Scripts -->
   <script src="resources/qgis2web_expressions.js"></script>
   <script src="./resources/functions.js"></script>
   <script src="./resources/ol.js"></script>
@@ -171,11 +159,10 @@
   <script src="styles/ActivityMidpoints_2_style.js"></script>
   <script src="styles/StormSewer_3_style.js"></script>
   <script src="styles/Inlets_4_style.js"></script>
-  <script src="./layers/layers.js" type="text/javascript"></script>
+  <script src="./layers/layers.js"></script>
   <script src="./resources/Autolinker.min.js"></script>
   <script src="./resources/qgis2web.js"></script>
 
-  <!-- PDF Viewer Script -->
   <script>
     function openPDF(filename, linkElement) {
       const modal = document.getElementById("pdfModal");
@@ -195,7 +182,6 @@
       document.querySelectorAll('.pdf-link').forEach(link => link.style.fontWeight = 'normal');
     }
 
-    // Make modal draggable
     dragElement(document.getElementById("pdfModal"));
     function dragElement(elmnt) {
       const header = document.getElementById("modalHeader");
