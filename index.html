@@ -1,135 +1,150 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no,width=device-width">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width" />
+  <title>Bay City CDBG MIT Drainage Project</title>
 
-  <link rel="stylesheet" href="./resources/ol.css">
-  <link rel="stylesheet" href="resources/fontawesome-all.min.css">
-  <link rel="stylesheet" href="./resources/ol-layerswitcher.css">
-  <link rel="stylesheet" href="./resources/qgis2web.css">
+  <!-- Core OpenLayers/QGIS2Web styles -->
+  <link rel="stylesheet" href="./resources/ol.css" />
+  <link rel="stylesheet" href="resources/fontawesome-all.min.css" />
+  <link rel="stylesheet" href="./resources/ol-layerswitcher.css" />
+  <link rel="stylesheet" href="./resources/qgis2web.css" />
 
   <style>
     html, body {
-      margin: 0;
-      padding: 0;
-      height: 100%;
-      overflow: hidden;
-    }
+  margin: 0;
+  padding: 0;
+  font-family: sans-serif;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+
     #map {
-      height: 100%;
-      width: 100%;
       position: absolute;
-      top: 60px;
+      top: 50px;
       left: 220px;
+      right: 0;
+      bottom: 0;
     }
-    .header {
+
+    @media (max-width: 700px) {
+      #map {
+        left: 0;
+        top: 100px;
+      }
+      #pdfSidebar {
+        display: none;
+      }
+    }
+
+    .ol-control > * {
+      background-color: #f8f8f8 !important;
+      color: #444 !important;
+      border-radius: 0;
+    }
+
+    /* HEADER BAR */
+    #headerBar {
       position: absolute;
       top: 0;
       left: 0;
-      width: 100%;
-      height: 60px;
-      background-color: #003f87;
+      right: 0;
+      height: 50px;
+      background: #004080;
       color: white;
       display: flex;
       align-items: center;
-      justify-content: center;
-      font-family: sans-serif;
-      font-size: 18px;
-      z-index: 1000;
+      padding-left: 20px;
+      z-index: 1001;
     }
-    .sidebar {
+
+    /* SIDEBAR */
+    #pdfSidebar {
       position: absolute;
-      top: 60px;
+      top: 50px;
       left: 0;
       width: 220px;
-      height: calc(100% - 60px);
+      height: calc(100% - 50px);
       background: #e6f0ff;
-      padding: 10px;
-      font-family: sans-serif;
+      padding: 15px;
+      box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
       z-index: 1000;
     }
-    .sidebar img {
-      width: 90px;
-      cursor: pointer;
-      margin-bottom: 10px;
-    }
-    .modal {
+
+    /* MODAL */
+    #pdfModal {
       display: none;
       position: fixed;
+      top: 10%;
+      left: 10%;
+      width: 80%;
+      height: 80%;
+      background: white;
+      border: 2px solid #888;
       z-index: 2000;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      overflow: auto;
-      background-color: rgba(0,0,0,0.4);
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
     }
-    .modal-content {
-      position: relative;
-      background-color: #fff;
-      margin: 5% auto;
-      padding: 0;
-      border: 1px solid #888;
-      width: 90%;
-      max-width: 1000px;
-      height: 85%;
-      box-shadow: 0 5px 15px rgba(0,0,0,.5);
-      display: flex;
-      flex-direction: column;
-    }
-    .modal-header {
-      background: #003f87;
+
+    #modalHeader {
+      background: #004080;
       color: white;
-      padding: 10px;
+      padding: 8px 12px;
+      cursor: move;
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
-    .modal-body {
-      flex-grow: 1;
-      padding: 0;
-    }
-    .modal-body iframe {
-      width: 100%;
-      height: 100%;
-      border: none;
-    }
-    .close {
-      background: #fff;
-      color: #003f87;
-      border: none;
+
+    #modalHeader button {
+      background: white;
+      color: #004080;
       font-weight: bold;
+      border: none;
       padding: 5px 10px;
       cursor: pointer;
     }
+
+    #pdfFrame {
+      width: 100%;
+      height: calc(100% - 40px);
+      border: none;
+    }
+
     .pdf-link {
-      cursor: pointer;
-      color: #003f87;
-      display: block;
-      margin-top: 6px;
+      text-decoration: none;
+    }
+
+    .pdf-link:hover {
+      text-decoration: underline;
     }
   </style>
-
-  <title>Bay City CDBG MIT Drainage Project</title>
 </head>
+
 <body>
-  <div class="header">
+  <!-- HEADER -->
+  <div id="headerBar">
+    <a href="https://www.cityofbaycity.org/" target="_blank">
+      <img src="CITY_SEAL.png" height="32" alt="City Seal" style="margin-right: 10px; cursor: pointer;" />
+    </a>
     Bay City CDBG MIT Drainage Project
   </div>
 
-  <div class="sidebar">
+  <!-- SIDEBAR -->
+  <div id="pdfSidebar">
     <a href="https://www.cityofbaycity.org/" target="_blank">
-      <img src="CITY_SEAL.png" alt="City Seal">
+      <img src="CITY_SEAL.png" style="width: 100px; margin-bottom: 10px; cursor: pointer;" alt="City Seal" />
     </a>
-    <div><strong>Documents</strong></div>
-    <a class="pdf-link" onclick="openModal('City of Bay City - Project Map Area 14.pdf', 'City of Bay City - Project Map Area 14')">View Area 14 Map</a>
-    <a class="pdf-link" onclick="openModal('City of Bay City - Project Map Area 19.pdf', 'City of Bay City - Project Map Area 19')">View Area 19 Map</a>
+    <h3 style="margin-top: 0; font-size: 16px;">Documents</h3>
+    <ul style="list-style-type: none; padding-left: 0; font-size: 14px; line-height: 1.6;">
+      <li><a href="#" class="pdf-link" onclick="openPDF('City%20of%20Bay%20City%20-%20Project%20Map%20Area%2014.pdf', this)">📄 View Area 14 Map</a></li>
+      <li><a href="#" class="pdf-link" onclick="openPDF('City%20of%20Bay%20City%20-%20Project%20Map%20Area%2019.pdf', this)">📄 View Area 19 Map</a></li>
+    </ul>
   </div>
 
+  <!-- MAP -->
   <div id="map">
     <div id="popup" class="ol-popup">
       <a href="#" id="popup-closer" class="ol-popup-closer"></a>
@@ -137,18 +152,16 @@
     </div>
   </div>
 
-  <div id="pdfModal" class="modal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <span id="modalTitle">PDF Viewer</span>
-        <button class="close" onclick="closeModal()">✖ Close</button>
-      </div>
-      <div class="modal-body">
-        <iframe id="pdfFrame" src=""></iframe>
-      </div>
+  <!-- MODAL PDF VIEWER -->
+  <div id="pdfModal">
+    <div id="modalHeader">
+      <span id="pdfTitle">PDF Viewer</span>
+      <button onclick="closePDF()">✖ Close</button>
     </div>
+    <iframe id="pdfFrame"></iframe>
   </div>
 
+  <!-- QGIS2Web + OpenLayers Scripts -->
   <script src="resources/qgis2web_expressions.js"></script>
   <script src="./resources/functions.js"></script>
   <script src="./resources/ol.js"></script>
@@ -165,20 +178,54 @@
   <script src="./resources/Autolinker.min.js"></script>
   <script src="./resources/qgis2web.js"></script>
 
+  <!-- PDF Viewer Script -->
   <script>
-    function openModal(pdfPath, title) {
-      document.getElementById("pdfFrame").src = pdfPath;
-      document.getElementById("modalTitle").innerText = title;
-      document.getElementById("pdfModal").style.display = "block";
+    function openPDF(filename, linkElement) {
+      const modal = document.getElementById("pdfModal");
+      const iframe = document.getElementById("pdfFrame");
+      const title = document.getElementById("pdfTitle");
+      iframe.src = `https://glopezCOBC.github.io/CDBG-MIT-Project/${filename}`;
+      title.textContent = decodeURIComponent(filename.replace('.pdf', ''));
+      modal.style.display = "block";
+
+      document.querySelectorAll('.pdf-link').forEach(link => link.style.fontWeight = 'normal');
+      if (linkElement) linkElement.style.fontWeight = 'bold';
     }
-    function closeModal() {
+
+    function closePDF() {
       document.getElementById("pdfModal").style.display = "none";
       document.getElementById("pdfFrame").src = "";
+      document.querySelectorAll('.pdf-link').forEach(link => link.style.fontWeight = 'normal');
     }
-    window.onclick = function(event) {
-      const modal = document.getElementById("pdfModal");
-      if (event.target === modal) {
-        closeModal();
+
+    // Make modal draggable
+    dragElement(document.getElementById("pdfModal"));
+    function dragElement(elmnt) {
+      const header = document.getElementById("modalHeader");
+      let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+      header.onmousedown = dragMouseDown;
+
+      function dragMouseDown(e) {
+        e.preventDefault();
+        pos3 = e.clientX;
+        pos4 = e.clientY;
+        document.onmouseup = closeDragElement;
+        document.onmousemove = elementDrag;
+      }
+
+      function elementDrag(e) {
+        e.preventDefault();
+        pos1 = pos3 - e.clientX;
+        pos2 = pos4 - e.clientY;
+        pos3 = e.clientX;
+        pos4 = e.clientY;
+        elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
+        elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+      }
+
+      function closeDragElement() {
+        document.onmouseup = null;
+        document.onmousemove = null;
       }
     }
   </script>
