@@ -3,32 +3,30 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
+  <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no,width=device-width">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
+
   <link rel="stylesheet" href="./resources/ol.css">
   <link rel="stylesheet" href="resources/fontawesome-all.min.css">
   <link rel="stylesheet" href="./resources/ol-layerswitcher.css">
   <link rel="stylesheet" href="./resources/qgis2web.css">
-  <title>Bay City CDBG MIT Drainage Project</title>
+
   <style>
     html, body {
       margin: 0;
+      padding: 0;
       height: 100%;
       overflow: hidden;
-      font-family: sans-serif;
     }
-
     #map {
+      height: 100%;
+      width: 100%;
       position: absolute;
       top: 60px;
-      left: 250px;
-      right: 0;
-      bottom: 0;
-      z-index: 0;
+      left: 220px;
     }
-
-    #header {
+    .header {
       position: absolute;
       top: 0;
       left: 0;
@@ -38,57 +36,98 @@
       color: white;
       display: flex;
       align-items: center;
-      padding: 0 15px;
-      box-sizing: border-box;
-      z-index: 2;
+      justify-content: center;
+      font-family: sans-serif;
+      font-size: 18px;
+      z-index: 1000;
     }
-
-    #sidebar {
+    .sidebar {
       position: absolute;
       top: 60px;
       left: 0;
-      width: 250px;
-      bottom: 0;
-      background-color: #e6f0ff;
-      padding: 15px;
-      box-sizing: border-box;
-      z-index: 2;
+      width: 220px;
+      height: calc(100% - 60px);
+      background: #e6f0ff;
+      padding: 10px;
+      font-family: sans-serif;
+      z-index: 1000;
     }
-
-    #city-logo {
-      display: block;
-      width: 80px;
-      margin: 0 auto 10px;
+    .sidebar img {
+      width: 90px;
       cursor: pointer;
+      margin-bottom: 10px;
     }
-
     .modal {
-      z-index: 10;
+      display: none;
+      position: fixed;
+      z-index: 2000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0,0,0,0.4);
     }
-
-    .ol-control {
-      z-index: 1;
+    .modal-content {
+      position: relative;
+      background-color: #fff;
+      margin: 5% auto;
+      padding: 0;
+      border: 1px solid #888;
+      width: 90%;
+      max-width: 1000px;
+      height: 85%;
+      box-shadow: 0 5px 15px rgba(0,0,0,.5);
+      display: flex;
+      flex-direction: column;
     }
-
-    .doc-link {
-      display: block;
-      margin: 5px 0;
+    .modal-header {
+      background: #003f87;
+      color: white;
+      padding: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .modal-body {
+      flex-grow: 1;
+      padding: 0;
+    }
+    .modal-body iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+    .close {
+      background: #fff;
       color: #003f87;
+      border: none;
       font-weight: bold;
+      padding: 5px 10px;
       cursor: pointer;
+    }
+    .pdf-link {
+      cursor: pointer;
+      color: #003f87;
+      display: block;
+      margin-top: 6px;
     }
   </style>
+
+  <title>Bay City CDBG MIT Drainage Project</title>
 </head>
 <body>
-  <div id="header">
-    <img src="CITY_SEAL.png" id="city-logo" alt="City Seal" onclick="window.open('https://www.cityofbaycity.org', '_blank')">
-    <span style="margin-left: 10px; font-size: 18px;">Bay City CDBG MIT Drainage Project</span>
+  <div class="header">
+    Bay City CDBG MIT Drainage Project
   </div>
 
-  <div id="sidebar">
-    <h3>Documents</h3>
-    <a class="doc-link" onclick="openModal('City of Bay City - Project Map Area 14.pdf', 'City of Bay City - Project Map Area 14')">View Area 14 Map</a>
-    <a class="doc-link" onclick="openModal('City of Bay City - Project Map Area 19.pdf', 'City of Bay City - Project Map Area 19')">View Area 19 Map</a>
+  <div class="sidebar">
+    <a href="https://www.cityofbaycity.org/" target="_blank">
+      <img src="CITY_SEAL.png" alt="City Seal">
+    </a>
+    <div><strong>Documents</strong></div>
+    <a class="pdf-link" onclick="openModal('City of Bay City - Project Map Area 14.pdf', 'City of Bay City - Project Map Area 14')">View Area 14 Map</a>
+    <a class="pdf-link" onclick="openModal('City of Bay City - Project Map Area 19.pdf', 'City of Bay City - Project Map Area 19')">View Area 19 Map</a>
   </div>
 
   <div id="map">
@@ -98,26 +137,17 @@
     </div>
   </div>
 
-  <!-- Modal -->
-  <div id="pdf-modal" style="display:none; position:fixed; top:60px; left:250px; right:0; bottom:0; background:#fff; z-index:10; box-shadow: 0 0 8px rgba(0,0,0,0.3);">
-    <div style="background:#003f87; color:white; padding:10px; display:flex; justify-content:space-between; align-items:center;">
-      <span id="modal-title">PDF Viewer</span>
-      <button onclick="closeModal()" style="background:white; color:#003f87; border:none; padding:5px 10px; cursor:pointer;">✖ Close</button>
+  <div id="pdfModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <span id="modalTitle">PDF Viewer</span>
+        <button class="close" onclick="closeModal()">✖ Close</button>
+      </div>
+      <div class="modal-body">
+        <iframe id="pdfFrame" src=""></iframe>
+      </div>
     </div>
-    <iframe id="pdf-frame" src="" style="width:100%; height:calc(100% - 50px); border:none;"></iframe>
   </div>
-
-  <script>
-    function openModal(file, title) {
-      document.getElementById('pdf-modal').style.display = 'block';
-      document.getElementById('pdf-frame').src = file;
-      document.getElementById('modal-title').innerText = title;
-    }
-    function closeModal() {
-      document.getElementById('pdf-modal').style.display = 'none';
-      document.getElementById('pdf-frame').src = '';
-    }
-  </script>
 
   <script src="resources/qgis2web_expressions.js"></script>
   <script src="./resources/functions.js"></script>
@@ -134,5 +164,23 @@
   <script src="./layers/layers.js" type="text/javascript"></script>
   <script src="./resources/Autolinker.min.js"></script>
   <script src="./resources/qgis2web.js"></script>
+
+  <script>
+    function openModal(pdfPath, title) {
+      document.getElementById("pdfFrame").src = pdfPath;
+      document.getElementById("modalTitle").innerText = title;
+      document.getElementById("pdfModal").style.display = "block";
+    }
+    function closeModal() {
+      document.getElementById("pdfModal").style.display = "none";
+      document.getElementById("pdfFrame").src = "";
+    }
+    window.onclick = function(event) {
+      const modal = document.getElementById("pdfModal");
+      if (event.target === modal) {
+        closeModal();
+      }
+    }
+  </script>
 </body>
 </html>
